@@ -1,0 +1,1 @@
+{"bikes": [{"model": "KTM-Exc125", "year": "2012", "distance": 3057, "fuel": 7, "tire": 281, "consumption": 7}, {"model": "KTM-Exc250", "year": "2012", "distance": "3000", "fuel": "10", "tire": "300", "consumption": "7"}, {"model": "KTM-Exc450", "year": "2012", "distance": 3019, "fuel": 9, "tire": 319, "consumption": 7}]}

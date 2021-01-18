@@ -1,6 +1,7 @@
 from typing import List
 import math 
 from datetime import datetime
+import json
 
 settlements = [] #List of the settlements
 
@@ -19,6 +20,16 @@ def getCordinate(name) ->str:
   for i in range(len(settlements)):
     if settlements[i][0] == name:
       return settlements[i][1]
+
+def IsInSettlements(name) -> bool:
+  """
+  This check the settlement is in the list.
+  """
+  settlement = []
+  for i in range(len(settlements)):
+    settlement.append(settlements[i][0])
+  if name not in settlement: return False
+  else: return True
 
 def getDistance(lat1,lon1,lat2,lon2) -> float:
   """
@@ -78,46 +89,3 @@ def getDate() ->str:
   This function get the date of today.
   """
   return datetime.today().strftime("%Y-%m-%d")
-
-def consumptionCalc(distance,consumption) -> float:
-  """
-  This function calculate the fuel consumption on 100km.
-
-  Args:
-    distance, consumption (int): The travled distance (km) and the consumption of the motorbike (l/100km).
-  Returns:
-    >>>consumptionCalc(100,7)
-    7.0
-    >>>consumptionCalc(20,7))
-    1.4000000000000001
-  """
-  return (distance / 100) * float(consumption)
-
-def tireWearCalc(distance_tire) ->float:
-  """
-  This function calculate the tires' status (%). The value is only approximate. Abou 40000 is the average lifetime of a tire in km (motorbikes).
-  Args:
-    distance_tire (int): The current km in the tires.
-  Returns:
-    >>>tireWearCalc(100)
-    99.75
-    >>>tireWearCalc(35000)
-    12.5
-  """
-  return ((40000-distance_tire) / 40000) * 100 
-
-def addNewBike()->None:
-    """
-    This function add new bike to the "motorbikes.txt".
-    """
-    model= str(input("Motor neve és típusa (formátum: KTM-Exc125): "))
-    year = str(input("Évjárat: "))
-    distance = int(input("Kilóméter óra: "))
-    fuel = int(input("Üzemanyag szint (liter): "))
-    tire = int(input("Mennyi kilóméter van a gumikban: "))
-    consumption = int(input("Fogyasztás (liter/100km): "))
-
-    file = open("motorbikes.txt","a",encoding="utf-8")
-    file.writelines("\n"+model+" "+year+" "+str(distance)+" "+str(fuel)+" "+str(tire)+" "+str(consumption))
-    file.close()
-
