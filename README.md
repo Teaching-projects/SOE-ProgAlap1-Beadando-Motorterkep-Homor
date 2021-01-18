@@ -39,3 +39,9 @@ Itt megtekinthető a helyek, ahol már jártunk, illetve ahol még nem.
 Itt megtekinthető, hogy hány motor van tárolva (motorbikes.txt). Itt lehet hozzáadni új motort, illetve törölni is.
 ## 0. Kilépés
 A program bezáródik.
+
+## Fájlok
+- settlements.txt -> Vas megye települései és a hozzá tartozó kordináta.
+- places.txt -> Itt tárolódnak azok a települések, amiket már felvettünk egy túránál, ergo a bejárt települések.
+- tours.txt -> A túrák eltárolva.
+- data.json -> Az eltárolt motorok.
