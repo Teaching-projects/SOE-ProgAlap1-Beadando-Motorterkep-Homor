@@ -1,6 +1,6 @@
 # SOE-ProgAlap1-Beadando-Motorterkep-Homor
 
-A program egy egyszerű kis "házi nyilvántartás", motorozással kapcsolatban. A programban felvehetsz túrákat, hogy merre jártál, addhatsz hozzá több motort is és kiválaszthatod, hogy melyikkel mentél, megtekintheted a helyeket, ahol már jártál és ahol még nem. A program Vas megye településeire van korlátozódva.
+A program egy egyszerű kis "házi nyilvántartás", motorozással kapcsolatban. A programban felvehetsz túrákat, hogy merre jártál, addhatsz hozzá több motort is és kiválaszthatod, hogy melyikkel mentél, megtekintheted a helyeket, ahol már jártál és ahol még nem. A program Vas megye településeire van korlátozódva, ami a settlements.txt-ben van eltárolva (telepulésnév:kordináta) formátumban.
 
 ## A következő menü fogad elinditáskor:
 ```
