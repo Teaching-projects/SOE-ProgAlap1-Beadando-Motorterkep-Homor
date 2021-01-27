@@ -2,8 +2,7 @@ from typing import List
 import math 
 from datetime import datetime
 import json
-
-settlements = [] #List of the settlements
+import motorbike as MOTORBIKE
 
 def getCordinate(name) ->str:
   """
@@ -12,24 +11,34 @@ def getCordinate(name) ->str:
   Args:
     name (str): The name of the settlement.
   Returns:
-    >>>getCordinate("Celldömölk")
-    47.25 17.15
-    >>>getCordinate("Sárvár")
-    47.25 16.9333
+    >>> getCordinate("Celldömölk")
+    '47.25 17.15'
+    >>> getCordinate("Sárvár")
+    '47.25 16.9333'
   """
-  for i in range(len(settlements)):
-    if settlements[i][0] == name:
-      return settlements[i][1]
+  data = ReadData()
+  for p in data["settlements"]:
+    if p["name"] == name:
+      return (p["latitude"] + " " + p["longitude"])
 
 def IsInSettlements(name) -> bool:
   """
   This check the settlement is in the list.
+
+  Args:
+    name (str): The name of the settlement.
+  Returns:
+    >>> IsInSettlements("Celldömölk")
+    True
+    >>> IsInSettlements("Sárvár")
+    True
   """
+  data = ReadData()
   settlement = []
-  for i in range(len(settlements)):
-    settlement.append(settlements[i][0])
-  if name not in settlement: return False
-  else: return True
+  for p in data["settlements"]:
+    settlement.append(p["name"])
+  if name in settlement: return True
+  else: return False
 
 def getDistance(lat1,lon1,lat2,lon2) -> float:
   """
@@ -38,9 +47,9 @@ def getDistance(lat1,lon1,lat2,lon2) -> float:
   Args:
     lat1,lon1,lat2,lon2 (float): Latitude, longitude. ex. 47.25 16.9333
   Returns:
-    >>>getDistance(47.25,17.15,47.25,16.9333)
+    >>> getDistance(47.25,17.15,47.25,16.9333)
     16.360958348891938
-    >>>getDistance(47.2,17.1833,47.25,16.9333)
+    >>> getDistance(47.2,17.1833,47.25,16.9333)
     19.68590258255439
   """
   R = 6372.8 # Earth radius in kilometers: 6372.8 km
@@ -55,15 +64,13 @@ def getDistance(lat1,lon1,lat2,lon2) -> float:
 
   return R * c
 
-def loadSettlements() ->List:
-    """
-    This function load the settlements' name and cordinates to the "settlements" list.
-    """
-    text = open("settlements.txt","r",encoding="utf-8")
-    lines = text.read().split("\n")
-    for line in lines:
-        settlements.append(line.split(":"))
-    return settlements
+def ReadData() -> List:
+  """
+  This will read from "data.json" and return a list.
+  """
+  with open('data.json') as json_file:
+    data = json.load(json_file)
+  return data
 
 def Traveled_Distance(distances) ->int:
   """
@@ -71,12 +78,9 @@ def Traveled_Distance(distances) ->int:
   Args:
     distances (list): In this list, there are the distances between coordinates.
   Returns:
-    distances = [1,2,3]
-    >>>Traveled_Distance(distances)
+    >>> Traveled_Distance([1,2,3])
     6
-
-    distances = [2,2,3]
-    >>>Traveled_Distance(distances)
+    >>> Traveled_Distance([2,2,3])
     7
   """
   all_distance = 0
@@ -84,8 +88,38 @@ def Traveled_Distance(distances) ->int:
     all_distance += distances[i]
   return all_distance
 
+def ReadPlaces()->List:
+  """
+  This function read the data from "data.json".
+  """
+  file = open("places.txt","r",encoding='utf-8')
+  places = file.read()
+  file.close()
+  return places
+
 def getDate() ->str:
   """
   This function get the date of today.
   """
   return datetime.today().strftime("%Y-%m-%d")
+
+def Tour(start_place)->List:
+  """
+  Here you can add the places where u were. It will be return a list with the places.
+  """
+  distances = []
+  places = ReadPlaces()
+  new_places = []
+  if start_place not in places: new_places.append(start_place)
+  while True:
+    next_place = str(input("Következő helyszín (irj 'nincs'-et ha be akarod fejezni): "))
+    if next_place == "nincs": break
+    else:
+      if IsInSettlements(next_place) == True:
+        if next_place not in places: new_places.append(next_place)
+        start_location = getCordinate(start_place).split(" ")
+        next_location = getCordinate(next_place).split(" ")
+        distances.append(getDistance(float(start_location[0]),float(start_location[1]),float(next_location[0]),float(next_location[1])))
+        start_place = next_place
+      else: print("Nincs ilyen település a listában.")
+  return distances, new_places

@@ -41,7 +41,6 @@ Itt megtekinthető, hogy hány motor van tárolva (motorbikes.txt). Itt lehet ho
 A program bezáródik.
 
 ## Fájlok
-- settlements.txt -> Vas megye települései és a hozzá tartozó kordináta.
+- data.json -> Itt vannak tárolva a motorok, illetve a települések.
 - places.txt -> Itt tárolódnak azok a települések, amiket már felvettünk egy túránál, ergo a bejárt települések.
 - tours.txt -> A túrák eltárolva.
-- data.json -> Az eltárolt motorok.

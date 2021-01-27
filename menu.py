@@ -26,7 +26,7 @@ def drawMainMenu() -> None:
   elif choice == 0:
       exit()
   else: 
-      print("Nem megfelelő karaktert írtál.")
+      print("Nem megfelelőt írtál be. Próbáld újra.")
       drawMainMenu()
 
 def drawPlacesMenu() -> None:
@@ -50,7 +50,7 @@ def drawPlacesMenu() -> None:
   elif choice == 0:
     drawMainMenu()
   else: 
-    print("Nem megfelelő karaktert írtál") 
+    print("Nem megfelelőt írtál be. Próbáld újra.") 
     drawPlacesMenu()
 
 def drawBikesMenu() -> None:
@@ -77,7 +77,7 @@ def drawBikesMenu() -> None:
   elif choice == 0:
     drawMainMenu()
   else: 
-    print("Nem megfelelő karaktert írtál") 
+    print("Nem megfelelőt írtál be. Próbáld újra.") 
     drawBikesMenu()
 
 def AddTour() -> None:
@@ -85,91 +85,48 @@ def AddTour() -> None:
     In this function is the logic of option 1 in main menu. 
     Here you can add new tour, which will be stored in "tours.txt".
     """
-    distances = []
-    new_places = []
     date = FUNCTIONS.getDate()
+    places = FUNCTIONS.ReadPlaces()
+    data = FUNCTIONS.ReadData()
 
-    file = open("places.txt","r",encoding='utf-8')
-    places = file.read()
-    file.close()
-
-    data = MOTORBIKE.ReadBikes()
     print("- Túra bevitel - ")
-
     if not data:
       print("- Motor felvétele -")
       MOTORBIKE.addNewBike()
     else:
-      count = 0
-      print("- Motor kiválasztása -")
-      for p in data['bikes']:
-        print(str(count+1)+") " + "Típus: " + str(p['model'])+"| "+"Évjárat: " + str(p['year'])+"| "+"Km óra: " + str(p['distance']))
-        print('')
-        count += 1
-      choice = int(input(">_ "))
+      count = MOTORBIKE.LenOfBikes()
+      choice = MOTORBIKE.ChooseBike()
       if count > choice-1:
-        model = data['bikes'][choice-1]["model"]
-        year = data['bikes'][choice-1]["year"]
-        distance = int(data['bikes'][choice-1]["distance"])
-        fuel = int(data['bikes'][choice-1]["fuel"])
-        tire = data['bikes'][choice-1]["tire"]
-        consumption = int(data['bikes'][choice-1]["consumption"])
+        bike = data["bikes"][choice-1]
       else: 
-        print("Nem megfelelőt írtál be.")
+        print("Nem megfelelőt írtál be. Próbáld újra.")
         print("\n")
-        AddTour()
+        drawMainMenu()
 
     start_place = str(input("Elindulási hely: "))
     if FUNCTIONS.IsInSettlements(start_place) == True:
-      if start_place not in places: new_places.append(start_place)
-      while True:
-        next_place = str(input("Következő helyszín (irj 'nincs'-et ha be akarod fejezni): "))
-        if next_place == "nincs": break
-        else:
-          if FUNCTIONS.IsInSettlements(next_place) == True:
-            if next_place not in places: new_places.append(next_place)
-            start_location = FUNCTIONS.getCordinate(start_place).split(" ")
-            next_location = FUNCTIONS.getCordinate(next_place).split(" ")
-            distances.append(FUNCTIONS.getDistance(float(start_location[0]),float(start_location[1]),float(next_location[0]),float(next_location[1])))
-            start_place = next_place
-          else: print("Nincs ilyen település a listában.")
+      distances, new_places = FUNCTIONS.Tour(start_place)
     else: 
       print("Nincs ilyen település a listában.")
       drawMainMenu()
 
-    fuel_status = fuel - int(MOTORBIKE.consumptionCalc(FUNCTIONS.Traveled_Distance(distances),consumption))
+    fuel_status = int(bike["fuel"]) - int(MOTORBIKE.consumptionCalc(FUNCTIONS.Traveled_Distance(distances),int(bike["consumption"])))
     tier_status = MOTORBIKE.tireWearCalc(FUNCTIONS.Traveled_Distance(distances))
-    distance_status = int(distance + FUNCTIONS.Traveled_Distance(distances))
+    distance_status = int(int(bike["distance"]) + FUNCTIONS.Traveled_Distance(distances))
 
-    new_data = {}
-    new_data['bikes'] = []
     for p in data['bikes']:
-      if p["model"] == model:
-        new_data['bikes'].append({
-        'model': model,
-        'year': year,
-        'distance': distance_status,
-        'fuel': fuel_status,
-        'tire': (int(tire)+int(FUNCTIONS.Traveled_Distance(distances))),
-        'consumption': consumption
-        })
-      else:
-        new_data['bikes'].append({
-        'model': p['model'],
-        'year': p['year'],
-        'distance': p['distance'],
-        'fuel': p['fuel'],
-        'tire': p['tire'],
-        'consumption': p['consumption']
-        })
+      if p["model"] == bike["model"]:
+        p["distance"] = distance_status
+        p["fuel"] = fuel_status
+        p["tire"] = (int(bike["tire"])+int(FUNCTIONS.Traveled_Distance(distances)))
     with open('data.json', 'w') as outfile:
-      json.dump(new_data, outfile)
+      json.dump(data, outfile)
 
     file = open("tours.txt","a",encoding="utf-8")
-    file.write('{:.2f}'.format(FUNCTIONS.Traveled_Distance(distances))+" km tettél meg a ("+date+") túrán, ezzel a motorral: "+model +" "+year +" | Gumik állapota: "+'{:.2f}'.format(tier_status)+" % | Üzemanyag: "+str(fuel_status)+" liter | Kilóméter: "+str(distance_status)+" km"+"\n")
+    file.write('{:.2f}'.format(FUNCTIONS.Traveled_Distance(distances))+" km tettél meg a ("+date+") túrán, ezzel a motorral: "+bike["model"] +" "+bike["year"] +" | Gumik állapota: "+'{:.2f}'.format(tier_status)+" % | Üzemanyag: "+str(fuel_status)+" liter | Kilóméter: "+str(distance_status)+" km"+"\n")
     file.close()
+    print('{:.2f}'.format(FUNCTIONS.Traveled_Distance(distances))+" km tettél meg a ("+date+") túrán, ezzel a motorral: "+bike["model"] +" "+bike["year"] +" | Gumik állapota: "+'{:.2f}'.format(tier_status)+" % | Üzemanyag: "+str(fuel_status)+" liter | Kilóméter: "+str(distance_status)+" km")
     
-    print('{:.2f}'.format(FUNCTIONS.Traveled_Distance(distances))+" km tettél meg a ("+date+") túrán, ezzel a motorral: "+model +" "+year +" | Gumik állapota: "+'{:.2f}'.format(tier_status)+" % | Üzemanyag: "+str(fuel_status)+" liter | Kilóméter: "+str(distance_status)+" km")
     if len(new_places) > 0:
       file = open("places.txt","a",encoding="utf8")
       print("Új helyek: ",end="")
@@ -199,7 +156,7 @@ def KnownPlaces() -> None:
         drawPlacesMenu()
     elif choice == "K": quit()
     else: 
-        print("Nem megfelelőt írtál.")
+        print("Nem megfelelőt írtál be. Próbáld újra.")
         drawMainMenu()
 
 def UnknownPlaces() -> None:
@@ -212,10 +169,10 @@ def UnknownPlaces() -> None:
     file = open("places.txt","r",encoding="utf-8")
     known_places= file.read()
     file.close()
-    FUNCTIONS.loadSettlements()
-    for i in range(len(FUNCTIONS.settlements)):
-        if FUNCTIONS.settlements[i][0] not in known_places:
-            unknown_places.append(FUNCTIONS.settlements[i][0])
+    data = FUNCTIONS.ReadData()
+    for p in data['settlements']:
+      if p["name"] not in known_places:
+        unknown_places.append(p["name"])
     print("Az alábbi helyeken még nem jártál ("+str(len(unknown_places))+")): ")
     for i in unknown_places:
         print(i,end=", ")
@@ -224,7 +181,7 @@ def UnknownPlaces() -> None:
     if choice == "V": drawPlacesMenu()
     elif choice == "K": quit()
     else: 
-        print("Nem megfelelőt írtál.")
+        print("Nem megfelelőt írtál be. Próbáld újra.")
         drawMainMenu()
         
 def ShowBikes() -> None:
@@ -232,7 +189,7 @@ def ShowBikes() -> None:
   This is the logic of submenu of option 3 in main menu. Option 1. 
   This will be show the motorbikes which are stored in the "data.json".
   """
-  data = MOTORBIKE.ReadBikes()
+  data = FUNCTIONS.ReadData()
   for p in data['bikes']:
     print("Típus: " + p['model'])
     print("Évjárat: " + p['year'])
@@ -247,7 +204,7 @@ def ShowBikes() -> None:
   if choice == "V": drawBikesMenu()
   elif choice == "K": quit()
   else: 
-        print("Nem megfelelőt írtál.")
+        print("Nem megfelelőt írtál be. Próbáld újra.")
         drawMainMenu()
 
 def NewBike() -> None:
@@ -261,7 +218,7 @@ def NewBike() -> None:
     if choice == "V": drawBikesMenu()
     elif choice == "K": quit()
     else: 
-        print("Nem megfelelőt írtál.")
+        print("Nem megfelelőt írtál be. Próbáld újra.")
         drawMainMenu()
 
 def DeleteBike() -> None:
@@ -269,7 +226,7 @@ def DeleteBike() -> None:
     This is the logic of submenu of option 3 in main menu. Option 3. 
     Here you can delete motorbike from "data.json" and it will be not stored anymore.
     """
-    data = MOTORBIKE.ReadBikes()
+    data = FUNCTIONS.ReadData()
     new_data = {}
     new_data['bikes'] = []
     count = 0
@@ -280,7 +237,7 @@ def DeleteBike() -> None:
     print("Melyik motort szeretnéd törölni? ")
     choice = int(input(">_ "))
     if choice > count: 
-        print("Nem megfelelőt választottál.")
+        print("Nem megfelelőt választottál. Próbáld újra.")
         drawBikesMenu()
     else:
       choosed_model = data['bikes'][count-1]["model"]
@@ -305,13 +262,12 @@ def DeleteBike() -> None:
     if choice == "V": drawBikesMenu()
     elif choice == "K": quit()
     else: 
-        print("Nem megfelelőt írtál.")
+        print("Nem megfelelőt írtál be. Próbáld újra.")
         drawMainMenu()
 
 def main() -> None:
     """
     This function contains all the previous functions in a logically correct order for the program to work.
     """
-    FUNCTIONS.loadSettlements()
     drawMainMenu()
 

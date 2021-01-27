@@ -1,5 +1,6 @@
 import json
 from typing import List
+import functions as FUNCTION
 
 def tireWearCalc(distance_tire) ->float:
   """
@@ -7,9 +8,9 @@ def tireWearCalc(distance_tire) ->float:
   Args:
     distance_tire (int): The current km in the tires.
   Returns:
-    >>>tireWearCalc(100)
+    >>> tireWearCalc(100)
     99.75
-    >>>tireWearCalc(35000)
+    >>> tireWearCalc(35000)
     12.5
   """
   return ((40000-distance_tire) / 40000) * 100 
@@ -21,10 +22,8 @@ def consumptionCalc(distance,consumption) -> float:
   Args:
     distance, consumption (int): The travled distance (km) and the consumption of the motorbike (l/100km).
   Returns:
-    >>>consumptionCalc(100,7)
+    >>> consumptionCalc(100,7)
     7.0
-    >>>consumptionCalc(20,7))
-    1.4000000000000001
   """
   return (distance / 100) * float(consumption)
 
@@ -32,8 +31,8 @@ def addNewBike()->None:
     """
     This function add new bike to the "data.json".
     """
-    model= str(input("Motor neve és típusa (formátum: KTM-Exc125): "))
-    year = str(input("Évjárat: "))
+    model= input("Motor neve és típusa (formátum: KTM-Exc125): ")
+    year = input("Évjárat: ")
     distance = int(input("Kilóméter óra: "))
     fuel = int(input("Üzemanyag szint (liter): "))
     tire = int(input("Mennyi kilóméter van a gumikban: "))
@@ -54,10 +53,25 @@ def addNewBike()->None:
     with open('data.json', 'w') as outfile:
       json.dump(data, outfile)
 
-def ReadBikes() -> List:
+def LenOfBikes()->int:
   """
-  This will read from "data.json" and return a list.
+  This will be give how many bike are stored in the list.
   """
-  with open('data.json') as json_file:
-    data = json.load(json_file)
-  return data
+  data = FUNCTION.ReadData()
+  count = 0
+  for p in data['bikes']:
+    count += 1
+  return count
+
+def ChooseBike():
+  """
+  Here you can choose the bike.
+  """
+  count = 0
+  data = FUNCTION.ReadData()
+  print("- Motor kiválasztása -")
+  for p in data['bikes']:
+    print(str(count+1)+") " + "Típus: " + str(p['model'])+"| "+"Évjárat: " + str(p['year'])+"| "+"Km óra: " + str(p['distance']))
+    print('')
+    count += 1
+  return int(input(">_ "))
